@@ -1,34 +1,36 @@
 # Sorsa MCP
 
-MCP-сервер для [Sorsa.io API v3](https://api.sorsa.io/v3/swagger.json) — доступа к данным X/Twitter
-(профили, твиты, поиск, проверки фолловов/ретвитов, Sorsa-скоры, списки, сообщества).
+An [MCP](https://modelcontextprotocol.io) server for the [Sorsa.io API v3](https://api.sorsa.io/v3/swagger.json) —
+access to X/Twitter data: profiles, tweets, search, follow/retweet checks, Sorsa scores, lists and communities.
 
-Сервер регистрирует **40 инструментов** — по одному на каждый эндпоинт API.
+The server exposes **40 tools**, one per API endpoint.
 
-## Установка
+## Installation
 
 ```bash
 npm install
 npm run build
 ```
 
-## Конфигурация
+Or, once published, run it with no install via `npx` (see below).
 
-Нужен API-ключ Sorsa. Он передаётся через переменную окружения `SORSA_API_KEY`
-и уходит в каждый запрос в заголовке `ApiKey`.
+## Configuration
 
-| Переменная        | Обязательна | По умолчанию                 |
-| ----------------- | ----------- | ---------------------------- |
-| `SORSA_API_KEY`   | да          | —                            |
-| `SORSA_BASE_URL`  | нет         | `https://api.sorsa.io/v3`    |
+You need a Sorsa API key. It is read from the `SORSA_API_KEY` environment variable
+and sent with every request in the `ApiKey` header.
 
-## Подключение к клиенту
+| Variable          | Required | Default                      |
+| ----------------- | -------- | ---------------------------- |
+| `SORSA_API_KEY`   | yes      | —                            |
+| `SORSA_BASE_URL`  | no       | `https://api.sorsa.io/v3`    |
+
+## Connecting a client
 
 ### Cursor
 
-`~/.cursor/mcp.json` (глобально) или `.cursor/mcp.json` в проекте.
+Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per project).
 
-После публикации в npm — ничего ставить не нужно, `npx` подтянет пакет сам:
+Using the published npm package (nothing to install, `npx` fetches it):
 
 ```json
 {
@@ -37,14 +39,14 @@ npm run build
       "command": "npx",
       "args": ["-y", "sorsa-mcp"],
       "env": {
-        "SORSA_API_KEY": "ВАШ_КЛЮЧ"
+        "SORSA_API_KEY": "YOUR_KEY"
       }
     }
   }
 }
 ```
 
-Либо, если запускаешь из локально собранного проекта:
+Or running from a locally built checkout:
 
 ```json
 {
@@ -53,7 +55,7 @@ npm run build
       "command": "node",
       "args": ["D:\\Code\\Cursor Projects\\Sorsa_MCP\\dist\\index.js"],
       "env": {
-        "SORSA_API_KEY": "ВАШ_КЛЮЧ"
+        "SORSA_API_KEY": "YOUR_KEY"
       }
     }
   }
@@ -62,52 +64,57 @@ npm run build
 
 ### Claude Desktop
 
-`%APPDATA%\Claude\claude_desktop_config.json` — тот же блок `mcpServers`, что выше.
-После правки конфига перезапусти приложение.
+Edit `%APPDATA%\Claude\claude_desktop_config.json` and add the same `mcpServers`
+block as above, then restart the app.
 
-## Локальная проверка
+## Local check
 
 ```bash
-# сборка
+# build
 npm run build
 
-# запуск (общается по stdio — для ручной проверки удобнее через клиент)
-SORSA_API_KEY=ВАШ_КЛЮЧ npm start
+# run (communicates over stdio — easiest to test through a client)
+SORSA_API_KEY=YOUR_KEY npm start
 ```
 
-Быстрый способ убедиться, что ключ рабочий, — вызвать инструмент `get_key_usage_info`:
-он вернёт остаток запросов и дату истечения ключа.
+The quickest way to confirm your key works is the `get_key_usage_info` tool —
+it returns your remaining request balance and the key's expiration date.
 
-## Доступные инструменты
+## Available tools
 
-**Профили:** `get_user_info`, `get_user_info_batch`, `get_followers`, `get_following`,
+**Profiles:** `get_user_info`, `get_user_info_batch`, `get_followers`, `get_following`,
 `get_verified_followers`, `get_account_about`
 
-**Твиты:** `get_tweet_info`, `get_tweet_info_bulk`, `get_user_tweets`, `get_tweet_comments`,
+**Tweets:** `get_tweet_info`, `get_tweet_info_bulk`, `get_user_tweets`, `get_tweet_comments`,
 `get_tweet_quotes`, `get_retweeters`, `get_article`, `get_trends`
 
-**Поиск:** `search_tweets`, `search_users`, `search_mentions`, `get_space_info`
+**Search:** `search_tweets`, `search_users`, `search_mentions`, `get_space_info`
 
-**Сообщества:** `get_community_members`, `get_community_tweets`, `search_community_tweets`
+**Communities:** `get_community_members`, `get_community_tweets`, `search_community_tweets`
 
-**Проверки:** `check_follow`, `check_comment`, `check_quoted`, `check_retweet`,
+**Checks:** `check_follow`, `check_comment`, `check_quoted`, `check_retweet`,
 `check_community_member`
 
-**Sorsa-метрики:** `get_sorsa_score`, `get_sorsa_score_changes`, `get_followers_stats`,
+**Sorsa metrics:** `get_sorsa_score`, `get_sorsa_score_changes`, `get_followers_stats`,
 `get_top_followers`, `get_top_following`, `get_new_followers_7d`, `get_new_following_7d`
 
-**Списки:** `get_list_members`, `get_list_tweets`, `get_list_followers`
+**Lists:** `get_list_members`, `get_list_tweets`, `get_list_followers`
 
-**Утилиты:** `username_to_id`, `id_to_username`, `link_to_id`, `get_key_usage_info`
+**Utilities:** `username_to_id`, `id_to_username`, `link_to_id`, `get_key_usage_info`
 
-## Структура
+## Project layout
 
-- `src/endpoints.ts` — декларативная таблица всех эндпоинтов (метод, путь, параметры).
-  Чтобы добавить/поправить инструмент — меняешь только её.
-- `src/index.ts` — HTTP-клиент + регистрация инструментов из таблицы.
+- `src/endpoints.ts` — a declarative table of every endpoint (method, path, parameters).
+  To add or change a tool, edit this file only.
+- `src/index.ts` — the HTTP client plus tool registration driven by that table.
 
-## Как это устроено
+## How it works
 
-Каждый эндпоинт описан как запись в `ENDPOINTS`. По полю `in` (`path` / `query` / `body`)
-обработчик раскладывает аргументы в URL-путь, query-строку или JSON-тело и шлёт запрос
-на Sorsa с заголовком `ApiKey`. Ответ возвращается клиенту как JSON-текст.
+Each endpoint is one entry in `ENDPOINTS`. Based on each field's `in`
+(`path` / `query` / `body`), the handler routes arguments into the URL path, the
+query string, or the JSON body, then sends the request to Sorsa with the `ApiKey`
+header. The response is returned to the client as JSON text.
+
+## License
+
+MIT
