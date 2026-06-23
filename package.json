@@ -1,7 +1,8 @@
 {
   "name": "sorsa-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MCP server for the Sorsa.io X/Twitter data API",
+  "mcpName": "io.github.Sorsa-io/sorsa-mcp",
   "type": "module",
   "license": "MIT",
   "keywords": [
@@ -13,13 +14,13 @@
     "claude",
     "cursor"
   ],
-  "homepage": "https://github.com/USER/sorsa-mcp#readme",
+  "homepage": "https://github.com/Sorsa-io/sorsa-mcp#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USER/sorsa-mcp.git"
+    "url": "git+https://github.com/Sorsa-io/sorsa-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/USER/sorsa-mcp/issues"
+    "url": "https://github.com/Sorsa-io/sorsa-mcp/issues"
   },
   "bin": {
     "sorsa-mcp": "dist/index.js"
