@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Sorsa-io/sorsa-mcp",
+  "description": "MCP server for the Sorsa.io X/Twitter data API",
+  "repository": {
+    "url": "https://github.com/Sorsa-io/sorsa-mcp",
+    "source": "github"
+  },
+  "version": "1.0.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "sorsa-mcp",
+      "version": "1.0.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SORSA_API_KEY",
+          "description": "Sorsa.io API key, sent in the ApiKey header with every request.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
