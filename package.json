@@ -1,6 +1,6 @@
 {
   "name": "sorsa-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for the Sorsa.io X/Twitter data API",
   "type": "module",
   "license": "MIT",
