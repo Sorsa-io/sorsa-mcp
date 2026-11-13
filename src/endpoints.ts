@@ -18,6 +18,9 @@ export interface Endpoint {
   path: string; // may contain {placeholders} for path params
   description: string;
   params: Record<string, Field>;
+  // Tools belonging to an optional product area stay in this table but are
+  // hidden from the MCP client unless the corresponding flag is enabled.
+  optIn?: "score";
 }
 
 // Most "look up an account" endpoints accept any one of these three.
@@ -318,6 +321,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/score",
     description: "Get the Sorsa Score for an account — a numeric estimate of its recognition and influence.",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -325,6 +329,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/score-changes",
     description: "Get the change in Sorsa Score over the last 7 and 30 days.",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -332,6 +337,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/followers-stats",
     description: "Get a breakdown of an account's followers by Sorsa category: influencers, projects, and VC employees.",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -339,6 +345,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/top-followers",
     description: "Get the 20 followers of an account with the highest Sorsa Score.",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -346,6 +353,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/top-following",
     description: "Get the 20 accounts a user follows with the highest Sorsa Score.",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -353,6 +361,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/new-followers-7d",
     description: "Get accounts that started following the user in the last 7 days (crypto ecosystem).",
+    optIn: "score",
     params: userQuery(),
   },
   {
@@ -360,6 +369,7 @@ export const ENDPOINTS: Endpoint[] = [
     method: "GET",
     path: "/new-following-7d",
     description: "Get accounts the user started following in the last 7 days (crypto ecosystem).",
+    optIn: "score",
     params: userQuery(),
   },
 
@@ -431,3 +441,15 @@ export const ENDPOINTS: Endpoint[] = [
     params: {},
   },
 ];
+
+// ---- Opt-in gating ----
+
+/** `SORSA_ENABLE_SCORE` accepts "1" or "true" (case-insensitive); anything else is off. */
+export function scoreOptInEnabled(rawValue: string | undefined): boolean {
+  return /^(1|true)$/i.test(rawValue?.trim() ?? "");
+}
+
+/** Endpoints to register for the given opt-in configuration. */
+export function endpointsFor(scoreEnabled: boolean): Endpoint[] {
+  return ENDPOINTS.filter((ep) => ep.optIn !== "score" || scoreEnabled);
+}

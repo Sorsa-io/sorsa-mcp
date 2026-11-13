@@ -2,7 +2,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z, ZodTypeAny } from "zod";
-import { ENDPOINTS, Endpoint, Field } from "./endpoints.js";
+import {
+  ENDPOINTS,
+  Endpoint,
+  Field,
+  endpointsFor,
+  scoreOptInEnabled,
+} from "./endpoints.js";
 
 const BASE_URL = process.env.SORSA_BASE_URL ?? "https://api.sorsa.io/v3";
 const API_KEY = process.env.SORSA_API_KEY;
@@ -15,6 +21,15 @@ if (!API_KEY) {
   );
   process.exit(1);
 }
+
+// Sorsa Score tools are opt-in: hidden unless SORSA_ENABLE_SCORE is 1/true.
+const SCORE_ENABLED = scoreOptInEnabled(process.env.SORSA_ENABLE_SCORE);
+const ENABLED_ENDPOINTS = endpointsFor(SCORE_ENABLED);
+
+console.error(
+  `[sorsa-mcp] ${ENABLED_ENDPOINTS.length} of ${ENDPOINTS.length} tools enabled ` +
+    `(Sorsa Score: ${SCORE_ENABLED ? "on" : "off"}).`
+);
 
 // ---- Build a zod field from the declarative spec ----
 function zodFor(field: Field): ZodTypeAny {
@@ -114,10 +129,10 @@ function tryParse(text: string): unknown {
 // ---- Wire up the server ----
 const server = new McpServer({
   name: "sorsa-mcp",
-  version: "1.0.0",
+  version: "1.0.5",
 });
 
-for (const ep of ENDPOINTS) {
+for (const ep of ENABLED_ENDPOINTS) {
   server.registerTool(
     ep.name,
     {
@@ -153,7 +168,7 @@ for (const ep of ENDPOINTS) {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error(`[sorsa-mcp] ready — ${ENDPOINTS.length} tools registered.`);
+  console.error(`[sorsa-mcp] ready — ${ENABLED_ENDPOINTS.length} tools registered.`);
 }
 
 main().catch((err) => {
